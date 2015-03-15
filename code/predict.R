@@ -1,5 +1,8 @@
 library(dplyr)
 library(caret)
+library(ggplot2)
+library(scales)
+library(lubridate)
 
 # Build a path for the data file name
 fn <- file.path('data', 'pml-training.csv')
@@ -27,6 +30,10 @@ names(high_nas)
 wle_clean <- wle_raw %>%
   select(-one_of(names(high_nas)))
 
+# Create a date column
+wle_clean <- wle_clean%>%
+  mutate(wle_date = dmy_hm(cvtd_timestamp))
+
 # Take a first look at the variables
 glimpse(wle_clean)
 
@@ -35,3 +42,53 @@ is_num <- sapply(wle_clean, is.numeric)
 
 num <- names(is_num[is_num == TRUE])
 non_num <- names(is_num[is_num == FALSE])
+
+# Create a data frame for bar graphs
+wle_bar <- wle_clean %>%
+  select(user_name, new_window, classe, wle_date) %>%
+  mutate(
+    user_name = factor(user_name)
+    , new_window = factor(new_window)
+    , classe = factor(classe)
+    , wle_date = as.Date(wle_date)
+    )
+
+glimpse(wle_bar)
+
+# Specify breaks as a Date vector
+date_breaks <- seq(as.Date(min(wle_clean$wle_date)), as.Date(max(wle_clean$wle_date)), by = '1 day')
+
+# Build a bar graph showing the number of observation by the user_name variable
+wle_bar %>%
+  group_by(wle_date, user_name) %>%
+  summarise( count = n()) %>%
+  ggplot(aes(x = wle_date, y = count, fill = user_name)) +
+    geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
+    scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
+    scale_y_continuous(labels = comma) +
+    xlab('Date') +
+    ylab('Count')
+    
+# Build a bar graph showing the number of observations by the classe variable
+wle_bar %>%
+  group_by(wle_date, classe) %>%
+  summarise( count = n()) %>%
+  ggplot(aes(x = wle_date, y = count, fill = classe)) +
+    geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
+    scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
+    scale_y_continuous(labels = comma) +
+    xlab('Date') +
+    ylab('Count')
+
+# Build a bar graph showing the number of observations by the classe variable
+wle_bar %>%
+  group_by(wle_date, new_window) %>%
+  summarise( count = n()) %>%
+  ggplot(aes(x = wle_date, y = count, fill = new_window)) +
+  geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
+  scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
+  scale_y_continuous(labels = comma) +
+  xlab('Date') +
+  ylab('Count')
+
+    
