@@ -30,3 +30,8 @@ wle_clean <- wle_raw %>%
 # Take a first look at the variables
 glimpse(wle_clean)
 
+# Check which variables are numeric
+is_num <- sapply(wle_clean, is.numeric)
+
+num <- names(is_num[is_num == TRUE])
+non_num <- names(is_num[is_num == FALSE])
