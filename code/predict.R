@@ -104,6 +104,11 @@ wle_bar %>%
   ylab('Count') +
   ggtitle('Number of observations by date and new_window\n')
 
+# Remove zero and near zero-variance predictos
+dim(wle_clean)
+nzv <- nearZeroVar(wle_clean)
+wle_clean <- wle_clean %>%
+  select(-nzv)
+dim(wle_clean)
 
-# Create dummy vars for the categorical variables
 
