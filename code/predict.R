@@ -41,7 +41,8 @@ wle_clean <- wle_clean %>%
 # Define factor variables
 wle_clean <- wle_clean %>%
   mutate(user_name = factor(user_name)
-         , new_window = factor(new_window))
+         , new_window = factor(new_window)
+         , classe = factor(classe))
 
 # Take a first look at the variables
 # glimpse(wle_clean)
@@ -76,7 +77,8 @@ wle_bar %>%
     scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
     scale_y_continuous(labels = comma) +
     xlab('Date') +
-    ylab('Count')
+    ylab('Count') +
+    ggtitle('Number of observations by date and user_name\n')
     
 # Build a bar graph showing the number of observations by the classe variable
 wle_bar %>%
@@ -87,7 +89,8 @@ wle_bar %>%
     scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
     scale_y_continuous(labels = comma) +
     xlab('Date') +
-    ylab('Count')
+    ylab('Count') +
+    ggtitle('Number of observations by date and classe\n')
 
 # Build a bar graph showing the number of observations by the new_window variable
 wle_bar %>%
@@ -98,6 +101,9 @@ wle_bar %>%
   scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
   scale_y_continuous(labels = comma) +
   xlab('Date') +
-  ylab('Count')
+  ylab('Count') +
+  ggtitle('Number of observations by date and new_window\n')
 
-    
+
+# Create dummy vars for the categorical variables
+
