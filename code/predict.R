@@ -17,25 +17,34 @@ df <- data.frame(Obs = d[1], Vars = d[2])
 df
 
 # Take a first look at the variables
-glimpse(wle_raw)
+# glimpse(wle_raw)
 
 # Get the percentage of NAs values in each variable
 perc_nas <- sapply(wle_raw, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
 high_nas <- perc_nas[perc_nas > 0.9]
-names(high_nas)
+# names(high_nas)
 
 # Remove the hight NAs variables
 wle_clean <- wle_raw %>%
-  select(-one_of(names(high_nas)))
+  select( - one_of(names(high_nas)))
 
 # Create a date column
 wle_clean <- wle_clean%>%
   mutate(wle_date = dmy_hm(cvtd_timestamp))
 
+# Remove the original timestamp variable
+wle_clean <- wle_clean %>%
+  select(- cvtd_timestamp)
+
+# Define factor variables
+wle_clean <- wle_clean %>%
+  mutate(user_name = factor(user_name)
+         , new_window = factor(new_window))
+
 # Take a first look at the variables
-glimpse(wle_clean)
+# glimpse(wle_clean)
 
 # Check which variables are numeric
 is_num <- sapply(wle_clean, is.numeric)
@@ -53,7 +62,7 @@ wle_bar <- wle_clean %>%
     , wle_date = as.Date(wle_date)
     )
 
-glimpse(wle_bar)
+# glimpse(wle_bar)
 
 # Specify breaks as a Date vector
 date_breaks <- seq(as.Date(min(wle_clean$wle_date)), as.Date(max(wle_clean$wle_date)), by = '1 day')
@@ -80,7 +89,7 @@ wle_bar %>%
     xlab('Date') +
     ylab('Count')
 
-# Build a bar graph showing the number of observations by the classe variable
+# Build a bar graph showing the number of observations by the new_window variable
 wle_bar %>%
   group_by(wle_date, new_window) %>%
   summarise( count = n()) %>%
