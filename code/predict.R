@@ -4,32 +4,46 @@ library(ggplot2)
 library(scales)
 library(lubridate)
 
+###############################################################################
+# Load the data
+###############################################################################
 # Build a path for the data file name
 fn <- file.path('data', 'pml-training.csv')
 
 # Load the training data
-wle_raw <- read.csv(fn, stringsAsFactor = FALSE, na.strings = c('NA', ''), quote = '\"')
+wle_raw <- read.csv(fn, stringsAsFactor = FALSE, na.strings = c('NA', '')
+                    , quote = '\"')
 wle_raw <- tbl_df(wle_raw)
 
+###############################################################################
+# First look at the raw data
+###############################################################################
 # How many observation and variables we have
 d <- dim(wle_raw)
 df <- data.frame(Obs = d[1], Vars = d[2])
 df
 
 # Take a first look at the variables
-# glimpse(wle_raw)
+ glimpse(wle_raw)
 
+###############################################################################
+# Remove variables with lots of NAs
+###############################################################################
 # Get the percentage of NAs values in each variable
 perc_nas <- sapply(wle_raw, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
 high_nas <- perc_nas[perc_nas > 0.9]
+
 # names(high_nas)
 
 # Remove the hight NAs variables
 wle_clean <- wle_raw %>%
   select( - one_of(names(high_nas)))
 
+###############################################################################
+# Transform original variables
+###############################################################################
 # Create a date column
 wle_clean <- wle_clean%>%
   mutate(wle_date = dmy_hm(cvtd_timestamp))
@@ -45,14 +59,17 @@ wle_clean <- wle_clean %>%
          , classe = factor(classe))
 
 # Take a first look at the variables
-# glimpse(wle_clean)
+glimpse(wle_clean)
 
 # Check which variables are numeric
-is_num <- sapply(wle_clean, is.numeric)
+#is_num <- sapply(wle_clean, is.numeric)
+#num <- names(is_num[is_num == TRUE])
+#non_num <- names(is_num[is_num == FALSE])
 
-num <- names(is_num[is_num == TRUE])
-non_num <- names(is_num[is_num == FALSE])
 
+###############################################################################
+# Plot some bar graphs
+###############################################################################
 # Create a data frame for bar graphs
 wle_bar <- wle_clean %>%
   select(user_name, new_window, classe, wle_date) %>%
@@ -104,7 +121,10 @@ wle_bar %>%
   ylab('Count') +
   ggtitle('Number of observations by date and new_window\n')
 
-# Remove zero and near zero-variance predictos
+
+###############################################################################
+# Remove zero and near zer-variance predictors
+###############################################################################
 dim(wle_clean)
 nzv <- nearZeroVar(wle_clean)
 wle_clean <- wle_clean %>%
