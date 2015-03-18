@@ -121,6 +121,13 @@ wle_bar %>%
   ylab('Count') +
   ggtitle('Number of observations by date and new_window\n')
 
+###############################################################################
+# Create dummy variables
+###############################################################################
+dummies <- dummyVars(classe ~ ., data = wle_clean)
+
+wle_clean <- tbl_df(as.data.frame(predict(dummies, newdata = wle_clean)))
+
 
 ###############################################################################
 # Remove zero and near zer-variance predictors
@@ -132,3 +139,5 @@ wle_clean <- wle_clean %>%
 dim(wle_clean)
 
 
+pre_pro <-  preProcess(wle_clean %>% select(-classe), method = c("center", "scale"))
+predict(pre_pro, wle)
