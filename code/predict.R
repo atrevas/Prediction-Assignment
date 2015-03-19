@@ -54,17 +54,6 @@ train <- train %>%
          , new_window = factor(new_window)
          , classe = factor(classe))
 
-# Create list of factor variables
-is_factor <- sapply(train, is.factor)
-factors <- names(is_factor[is_factor == TRUE])
-
-# Take a first look at the variables
-glimpse(train)
-
-# Check which variables are numeric
-is_num <- sapply(train, is.numeric)
-numerics <- names(is_num[is_num == TRUE])
-
 ###############################################################################
 # Plot some bar graphs
 ###############################################################################
@@ -123,6 +112,14 @@ bar %>%
 # Remove date and timestamp variables
 train <- train %>%
   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+
+# Create list of factor variables
+is_factor <- sapply(train, is.factor)
+factors <- names(is_factor[is_factor == TRUE])
+
+# reate list of numeric variables 
+is_num <- sapply(train, is.numeric)
+numerics <- names(is_num[is_num == TRUE])
 
 ###############################################################################
 # Create dummy variables
