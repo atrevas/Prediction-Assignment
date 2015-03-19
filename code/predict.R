@@ -44,13 +44,9 @@ train <- raw %>%
 ###############################################################################
 # Transform original variables
 ###############################################################################
-# Create a date column
+# Convert the date column
 train <- train %>%
-  mutate(wle_date = dmy_hm(cvtd_timestamp))
-
-# Remove the original timestamp variable
-train <- train %>%
-  select(- cvtd_timestamp)
+  mutate(cvtd_timestamp = dmy_hm(cvtd_timestamp))
 
 # Define factor variables
 train <- train %>%
@@ -60,7 +56,7 @@ train <- train %>%
 
 # Create list of factor variables
 is_factor <- sapply(train, is.factor)
-factors <- is_factor[is_factor == TRUE]
+factors <- names(is_factor[is_factor == TRUE])
 
 # Take a first look at the variables
 glimpse(train)
@@ -68,8 +64,6 @@ glimpse(train)
 # Check which variables are numeric
 is_num <- sapply(train, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
-
-
 
 ###############################################################################
 # Plot some bar graphs
@@ -125,6 +119,11 @@ bar %>%
   ylab('Count') +
   ggtitle('Number of observations by date and new_window\n')
 
+
+# Remove date and timestamp variables
+train <- train %>%
+  select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+
 ###############################################################################
 # Create dummy variables
 ###############################################################################
@@ -136,12 +135,14 @@ bar %>%
 ###############################################################################
 # Remove zero and near zer-variance predictors
 ###############################################################################
-# dim(wle_clean)
-# nzv <- nearZeroVar(wle_clean)
-# wle_clean <- wle_clean %>%
-#   select(-nzv)
-# dim(wle_clean)
+dim(train)
+nzv <- nearZeroVar(train)
+train <- train %>%
+  select(-nzv)
+dim(train)
 
-
+###############################################################################
+# Center and scale numeric variables
+###############################################################################
 pre_pro <-  preProcess(train[, numerics], method = c("center", "scale"))
 tbl_df(data.frame(predict(pre_pro, train[, numerics])))
