@@ -52,20 +52,7 @@ test <- raw_test %>%
   select( - one_of(high_nas))
 
 
-###############################################################################
-# Transform original variables
-###############################################################################
-# Convert the date column
-train <- train %>%
-  mutate(cvtd_timestamp = dmy_hm(cvtd_timestamp))
-
-# Define factor variables
-train <- train %>%
-  mutate(user_name = factor(user_name)
-         , new_window = factor(new_window)
-         , classe = factor(classe))
-
-###############################################################################
+##############################################################################
 # Plot some bar graphs
 ###############################################################################
 # Create a data frame for bar graphs
