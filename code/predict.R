@@ -38,16 +38,19 @@ rbind(df1, df2)
 # Remove variables with lots of NAs
 ###############################################################################
 # Get the percentage of NAs values in each variable
-perc_nas <- sapply(raw, function (x) sum(is.na(x)) / length(x))
+perc_nas <- sapply(raw_train, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
-high_nas <- perc_nas[perc_nas > 0.9]
+high_nas <- names(perc_nas[perc_nas > 0.9])
 
-# names(high_nas)
+# Remove the hight NAs variables from train data
+train <- raw_train %>%
+  select( - one_of(high_nas))
 
-# Remove the hight NAs variables
-train <- raw %>%
-  select( - one_of(names(high_nas)))
+# Remove the hight NAs variables from test data
+test <- raw_test %>%
+  select( - one_of(high_nas))
+
 
 ###############################################################################
 # Transform original variables
