@@ -57,18 +57,18 @@ test <- raw_test %>%
 ###############################################################################
 # Create a data frame for bar graphs
 bar <- train %>%
-  select(user_name, new_window, classe, wle_date) %>%
+  select(user_name, new_window, classe, cvtd_timestamp) %>%
   mutate(
     user_name = factor(user_name)
     , new_window = factor(new_window)
     , classe = factor(classe)
-    , wle_date = as.Date(wle_date)
+    , wle_date = as.Date(dmy_hm(cvtd_timestamp))
     )
 
 # glimpse(bar)
 
 # Specify breaks as a Date vector
-date_breaks <- seq(as.Date(min(train$wle_date)), as.Date(max(train$wle_date)), by = '1 day')
+date_breaks <- seq(as.Date(min(bar$wle_date)), as.Date(max(bar$wle_date)), by = '1 day')
 
 # Build a bar graph showing the number of observation by the user_name variable
 bar %>%
