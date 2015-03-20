@@ -18,19 +18,21 @@ load_data <- function(file){
 ###############################################################################
 # Load the training data
 raw_train <- load_data('pml-training.csv')
-              
 raw_train <- tbl_df(raw_train)
+
+# Load the test data
+raw_test <- load_data('pml-testing.csv')
+raw_test <- tbl_df(raw_test)
 
 ###############################################################################
 # First look at the raw data
 ###############################################################################
 # How many observation and variables we have
-d <- dim(raw)
-df <- data.frame(Obs = d[1], Vars = d[2])
-df
-
-# Take a first look at the variables
-glimpse(raw)
+d <- dim(raw_train)
+df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
+d <- dim(raw_test)
+df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
+rbind(df1, df2)
 
 ###############################################################################
 # Remove variables with lots of NAs
