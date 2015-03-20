@@ -4,16 +4,22 @@ library(ggplot2)
 library(scales)
 library(lubridate)
 
+load_data <- function(file){
+  # Build a path for the data file name
+  fn <- file.path('data', file)
+  
+  df <- read.csv(fn, stringsAsFactor = FALSE, na.strings = c('NA', '')
+                  , quote = '\"')
+  return (df)
+}
+
 ###############################################################################
 # Load the data
 ###############################################################################
-# Build a path for the data file name
-fn <- file.path('data', 'pml-training.csv')
-
 # Load the training data
-raw <- read.csv(fn, stringsAsFactor = FALSE, na.strings = c('NA', '')
-                    , quote = '\"')
-raw <- tbl_df(raw)
+raw_train <- load_data('pml-training.csv')
+              
+raw_train <- tbl_df(raw_train)
 
 ###############################################################################
 # First look at the raw data
