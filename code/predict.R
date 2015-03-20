@@ -8,7 +8,7 @@ load_data <- function(file){
   # Build a path for the data file name
   fn <- file.path('data', file)
   
-  df <- read.csv(fn, stringsAsFactor = FALSE, na.strings = c('NA', '')
+  df <- read.csv(fn, stringsAsFactor = TRUE, na.strings = c('NA', '')
                   , quote = '\"')
   return (df)
 }
