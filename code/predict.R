@@ -142,12 +142,8 @@ dim(test)
 
 
 ###############################################################################
-# Create lists of names of factor and numeric variables
+# Create list of names of numeric variables
 ###############################################################################
-# Create list of factor variables
-is_factor <- sapply(train, is.factor)
-factors <- names(is_factor[is_factor == TRUE])
-
 # Create list of numeric variables 
 is_num <- sapply(train, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
@@ -155,9 +151,15 @@ numerics <- names(is_num[is_num == TRUE])
 ###############################################################################
 # Center and scale numeric variables
 ###############################################################################
+# Estimate centering and scaling parameters from the training data
 pre <-  preProcess(train[, numerics], method = c("center", "scale"))
+
+# Apply centering and scaling to the train data
 pre_train <- data.frame(predict(pre, train[, numerics]))
 pre_train <- tbl_df(pre_train)
+train <- bind_cols(pre_train, train[ , c('user_name', 'classe')])
 
-# Add back the factor variables
-train <- bind_cols(pre_train, train[ , factors])
+# Apply centering and scaling to the test data
+pre_test <- data.frame(predict(pre, test[, numerics]))
+pre_test <- tbl_df(pre_test)
+test <- bind_cols(pre_test, test[ , c('user_name', 'problem_id')])
