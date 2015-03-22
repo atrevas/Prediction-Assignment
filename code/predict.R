@@ -51,7 +51,6 @@ train <- raw_train %>%
 test <- raw_test %>%
   select( - one_of(high_nas))
 
-
 ##############################################################################
 # Plot some bar graphs
 ###############################################################################
@@ -108,16 +107,9 @@ bar %>%
 
 
 # Remove date and timestamp variables
-train <- train %>%
-  select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+# train <- train %>%
+#   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
 
-# Create list of factor variables
-is_factor <- sapply(train, is.factor)
-factors <- names(is_factor[is_factor == TRUE])
-
-# reate list of numeric variables 
-is_num <- sapply(train, is.numeric)
-numerics <- names(is_num[is_num == TRUE])
 
 ###############################################################################
 # Create dummy variables
@@ -130,11 +122,29 @@ numerics <- names(is_num[is_num == TRUE])
 ###############################################################################
 # Remove zero and near zer-variance predictors
 ###############################################################################
-dim(train)
 nzv <- nearZeroVar(train)
+
+dim(train)
 train <- train %>%
   select(-nzv)
 dim(train)
+
+dim(test)
+test <- test %>%
+  select(-nzv)
+dim(test)
+
+
+###############################################################################
+# Create lists of names of factor and numeric variables
+###############################################################################
+# Create list of factor variables
+is_factor <- sapply(train, is.factor)
+factors <- names(is_factor[is_factor == TRUE])
+
+# Create list of numeric variables 
+is_num <- sapply(train, is.numeric)
+numerics <- names(is_num[is_num == TRUE])
 
 ###############################################################################
 # Center and scale numeric variables
