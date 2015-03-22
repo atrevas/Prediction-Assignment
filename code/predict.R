@@ -163,3 +163,13 @@ train <- bind_cols(pre_train, train[ , c('user_name', 'classe')])
 pre_test <- data.frame(predict(pre, test[, numerics]))
 pre_test <- tbl_df(pre_test)
 test <- bind_cols(pre_test, test[ , c('user_name', 'problem_id')])
+
+###############################################################################
+# Apply PCA to the training data
+###############################################################################
+# Estimate PCA paramters from the train data
+pre <- preProcess(train[ , numerics], method = c('pca'))
+
+# Apply PCA to the train data
+pca_train <- data.frame(predict(pre, train[ , numerics]))
+pca_train <- tbl_df(pca_train)
