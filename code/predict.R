@@ -149,5 +149,9 @@ numerics <- names(is_num[is_num == TRUE])
 ###############################################################################
 # Center and scale numeric variables
 ###############################################################################
-pre_pro <-  preProcess(train[, numerics], method = c("center", "scale"))
-tbl_df(data.frame(predict(pre_pro, train[, numerics])))
+pre <-  preProcess(train[, numerics], method = c("center", "scale"))
+pre_train <- data.frame(predict(pre, train[, numerics]))
+pre_train <- tbl_df(pre_train)
+
+# Add back the factor variables
+train <- bind_cols(pre_train, train[ , factors])
