@@ -106,10 +106,16 @@ bar %>%
   ggtitle('Number of observations by date and new_window\n')
 
 
-# Remove date and timestamp variables
-# train <- train %>%
-#   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+###############################################################################
+# Remove timestamp variables
+###############################################################################
+# From train data
+train <- train %>%
+   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
 
+# From test data
+test <- test %>%
+   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
 
 ###############################################################################
 # Create dummy variables
