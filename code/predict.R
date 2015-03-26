@@ -51,61 +51,6 @@ train <- raw_train %>%
 test <- raw_test %>%
   select( - one_of(high_nas))
 
-##############################################################################
-# Plot some bar graphs
-###############################################################################
-# Create a data frame for bar graphs
-bar <- train %>%
-  select(user_name, new_window, classe, cvtd_timestamp) %>%
-  mutate(
-    user_name = factor(user_name)
-    , new_window = factor(new_window)
-    , classe = factor(classe)
-    , wle_date = as.Date(dmy_hm(cvtd_timestamp))
-    )
-
-# glimpse(bar)
-
-# Specify breaks as a Date vector
-date_breaks <- seq(as.Date(min(bar$wle_date)), as.Date(max(bar$wle_date)), by = '1 day')
-
-# Build a bar graph showing the number of observation by the user_name variable
-bar %>%
-  group_by(wle_date, user_name) %>%
-  summarise( count = n()) %>%
-  ggplot(aes(x = wle_date, y = count, fill = user_name)) +
-    geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
-    scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
-    scale_y_continuous(labels = comma) +
-    xlab('Date') +
-    ylab('Count') +
-    ggtitle('Number of observations by date and user_name\n')
-    
-# Build a bar graph showing the number of observations by the classe variable
-bar %>%
-  group_by(wle_date, classe) %>%
-  summarise( count = n()) %>%
-  ggplot(aes(x = wle_date, y = count, fill = classe)) +
-    geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
-    scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
-    scale_y_continuous(labels = comma) +
-    xlab('Date') +
-    ylab('Count') +
-    ggtitle('Number of observations by date and classe\n')
-
-# Build a bar graph showing the number of observations by the new_window variable
-bar %>%
-  group_by(wle_date, new_window) %>%
-  summarise( count = n()) %>%
-  ggplot(aes(x = wle_date, y = count, fill = new_window)) +
-  geom_bar(stat = 'identity', width = 0.5, position = 'dodge') +
-  scale_x_date(breaks = date_breaks, labels = date_format('%d/%m/%Y')) +
-  scale_y_continuous(labels = comma) +
-  xlab('Date') +
-  ylab('Count') +
-  ggtitle('Number of observations by date and new_window\n')
-
-
 ###############################################################################
 # Remove timestamp variables
 ###############################################################################
