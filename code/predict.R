@@ -118,3 +118,20 @@ pre <- preProcess(train[ , numerics], method = c('pca'))
 # Apply PCA to the train data
 pca_train <- data.frame(predict(pre, train[ , numerics]))
 pca_train <- tbl_df(pca_train)
+pca_train <- bind_cols(pca_train, train[ , c('user_name', 'classe')])
+
+
+###############################################################################
+# Exploratory Data Analysis at the PCA
+###############################################################################
+ggplot(pca_train, aes(x = PC1, colour = classe)) +
+  geom_line(stat = 'density', size = 1) +
+  ggtitle('PC1 Density Plot\n') +
+  theme(plot.title = element_text(size = 25, face = 'bold')) +
+  ylab('Density')
+
+ggplot(pca_train, aes(x = PC2, colour = classe)) +
+  geom_line(stat = 'density', size = 1) +
+  ggtitle('PC2 Density Plot\n') +
+  theme(plot.title = element_text(size = 25, face = 'bold')) +
+  ylab('Density')
