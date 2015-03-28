@@ -112,7 +112,7 @@ test <- bind_cols(pre_test, test[ , c('user_name', 'problem_id')])
 ###############################################################################
 # Apply PCA to the training data
 ###############################################################################
-# Estimate PCA paramters from the train data
+# Estimate PCA parameters from the train data
 pre <- preProcess(train[ , numerics], method = c('pca'))
 
 # Apply PCA to the train data
@@ -120,6 +120,10 @@ pca_train <- data.frame(predict(pre, train[ , numerics]))
 pca_train <- tbl_df(pca_train)
 pca_train <- bind_cols(pca_train, train[ , c('user_name', 'classe')])
 
+# Apply PCA to the test data
+pca_test<- data.frame(predict(pre, test[ , numerics]))
+pca_test <- tbl_df(pca_test)
+pca_test <- bind_cols(pca_test, test[ , c('user_name', 'problem_id')])
 
 ###############################################################################
 # Exploratory Data Analysis at the PCA
@@ -133,5 +137,11 @@ ggplot(pca_train, aes(x = PC1, colour = classe)) +
 ggplot(pca_train, aes(x = PC2, colour = classe)) +
   geom_line(stat = 'density', size = 1) +
   ggtitle('PC2 Density Plot\n') +
+  theme(plot.title = element_text(size = 25, face = 'bold')) +
+  ylab('Density')
+
+ggplot(pca_train, aes(x = PC3, colour = classe)) +
+  geom_line(stat = 'density', size = 1) +
+  ggtitle('PC3 Density Plot\n') +
   theme(plot.title = element_text(size = 25, face = 'bold')) +
   ylab('Density')
