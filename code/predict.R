@@ -94,36 +94,20 @@ is_num <- sapply(train, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
 
 ###############################################################################
-# Center and scale numeric variables
+# Preprocess the data
 ###############################################################################
-# Estimate centering and scaling parameters from the training data
-pre <-  preProcess(train[, numerics], method = c("center", "scale"))
+# Estimate parameters from the training data
+pre <-  preProcess(train[, numerics], method = c('center', 'scale', 'pca'))
 
-# Apply centering and scaling to the train data
+# Apply the preprocessing to the train data
 pre_train <- data.frame(predict(pre, train[, numerics]))
 pre_train <- tbl_df(pre_train)
-train <- bind_cols(pre_train, train[ , c('user_name', 'classe')])
+train <- tbl_df(bind_cols(pre_train, train[ , c('user_name', 'classe')]))
 
 # Apply centering and scaling to the test data
 pre_test <- data.frame(predict(pre, test[, numerics]))
 pre_test <- tbl_df(pre_test)
-test <- bind_cols(pre_test, test[ , c('user_name', 'problem_id')])
-
-###############################################################################
-# Apply PCA to the training data
-###############################################################################
-# Estimate PCA parameters from the train data
-pre <- preProcess(train[ , numerics], method = c('pca'))
-
-# Apply PCA to the train data
-pca_train <- data.frame(predict(pre, train[ , numerics]))
-pca_train <- tbl_df(pca_train)
-pca_train <- bind_cols(pca_train, train[ , c('user_name', 'classe')])
-
-# Apply PCA to the test data
-pca_test<- data.frame(predict(pre, test[ , numerics]))
-pca_test <- tbl_df(pca_test)
-pca_test <- bind_cols(pca_test, test[ , c('user_name', 'problem_id')])
+test <- tbl_df(bind_cols(pre_test, test[ , c('user_name', 'problem_id')]))
 
 ###############################################################################
 # Exploratory Data Analysis at the PCA
@@ -145,3 +129,7 @@ ggplot(pca_train, aes(x = PC3, colour = classe)) +
   ggtitle('PC3 Density Plot\n') +
   theme(plot.title = element_text(size = 25, face = 'bold')) +
   ylab('Density')
+
+###############################################################################
+# Cross-Validation on the training set
+###############################################################################
