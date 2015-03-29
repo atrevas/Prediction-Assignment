@@ -3,6 +3,7 @@ library(caret)
 library(ggplot2)
 library(scales)
 library(lubridate)
+library(rpart)
 
 load_data <- function(file){
   # Build a path for the data file name
@@ -131,5 +132,11 @@ ggplot(pca_train, aes(x = PC3, colour = classe)) +
   ylab('Density')
 
 ###############################################################################
-# Cross-Validation on the training set
+# Train the model
 ###############################################################################
+set.seed(123)
+fit_control <- trainControl(method = 'cv', number = 10, repeats = 10)
+
+model_fit <- train(classe ~ ., data = select(train,-user_name)
+                   , method = 'rpart'
+                   , trControl = fit_control)
