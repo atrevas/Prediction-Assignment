@@ -95,22 +95,6 @@ is_num <- sapply(train, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
 
 ###############################################################################
-# Preprocess the data
-###############################################################################
-# Estimate parameters from the training data
-pre <-  preProcess(train[, numerics], method = c('center', 'scale', 'pca'))
-
-# Apply the preprocessing to the train data
-pre_train <- data.frame(predict(pre, train[, numerics]))
-pre_train <- tbl_df(pre_train)
-train <- tbl_df(bind_cols(pre_train, train[ , c('user_name', 'classe')]))
-
-# Apply centering and scaling to the test data
-pre_test <- data.frame(predict(pre, test[, numerics]))
-pre_test <- tbl_df(pre_test)
-test <- tbl_df(bind_cols(pre_test, test[ , c('user_name', 'problem_id')]))
-
-###############################################################################
 # Exploratory Data Analysis at the PCA
 ###############################################################################
 ggplot(pca_train, aes(x = PC1, colour = classe)) +
@@ -136,10 +120,11 @@ ggplot(pca_train, aes(x = PC3, colour = classe)) +
 ###############################################################################
 set.seed(123)
 
-# Create 
+# Create a smaller sample for training the model
 small_train <- train %>%
   sample_frac(0.1, replace = FALSE)
 
+# Train the model
 fit_control <- trainControl(method = 'repeatedcv', number = 4)
 
 model_fit <- train(classe ~ ., data = select(small_train,-user_name)
