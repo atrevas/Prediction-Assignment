@@ -135,8 +135,15 @@ ggplot(pca_train, aes(x = PC3, colour = classe)) +
 # Train the model
 ###############################################################################
 set.seed(123)
-fit_control <- trainControl(method = 'cv', number = 10, repeats = 10)
 
-model_fit <- train(classe ~ ., data = select(train,-user_name)
-                   , method = 'rpart'
+# Create 
+small_train <- train %>%
+  sample_frac(0.1, replace = FALSE)
+
+fit_control <- trainControl(method = 'repeatedcv', number = 4)
+
+model_fit <- train(classe ~ ., data = select(small_train,-user_name)
+                   , method = 'rf'
+                   , metric = 'Accuracy'
                    , trControl = fit_control)
+model_fit
