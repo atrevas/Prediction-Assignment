@@ -130,9 +130,10 @@ small_train <- train[indx, ]
 # Train the model
 fit_control <- trainControl(method = 'repeatedcv'
                             , number = 4)
-
+ptm <- proc.time()
 model_fit <- train(classe ~ ., data = select(small_train,-user_name)
                    , method = 'rf'
                    , metric = 'Accuracy'
                    , trControl = fit_control)
+proc.time() - ptm
 model_fit
