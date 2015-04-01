@@ -97,23 +97,23 @@ numerics <- names(is_num[is_num == TRUE])
 ###############################################################################
 # Exploratory Data Analysis at the PCA
 ###############################################################################
-ggplot(pca_train, aes(x = PC1, colour = classe)) +
-  geom_line(stat = 'density', size = 1) +
-  ggtitle('PC1 Density Plot\n') +
-  theme(plot.title = element_text(size = 25, face = 'bold')) +
-  ylab('Density')
-
-ggplot(pca_train, aes(x = PC2, colour = classe)) +
-  geom_line(stat = 'density', size = 1) +
-  ggtitle('PC2 Density Plot\n') +
-  theme(plot.title = element_text(size = 25, face = 'bold')) +
-  ylab('Density')
-
-ggplot(pca_train, aes(x = PC3, colour = classe)) +
-  geom_line(stat = 'density', size = 1) +
-  ggtitle('PC3 Density Plot\n') +
-  theme(plot.title = element_text(size = 25, face = 'bold')) +
-  ylab('Density')
+# ggplot(pca_train, aes(x = PC1, colour = classe)) +
+#   geom_line(stat = 'density', size = 1) +
+#   ggtitle('PC1 Density Plot\n') +
+#   theme(plot.title = element_text(size = 25, face = 'bold')) +
+#   ylab('Density')
+# 
+# ggplot(pca_train, aes(x = PC2, colour = classe)) +
+#   geom_line(stat = 'density', size = 1) +
+#   ggtitle('PC2 Density Plot\n') +
+#   theme(plot.title = element_text(size = 25, face = 'bold')) +
+#   ylab('Density')
+# 
+# ggplot(pca_train, aes(x = PC3, colour = classe)) +
+#   geom_line(stat = 'density', size = 1) +
+#   ggtitle('PC3 Density Plot\n') +
+#   theme(plot.title = element_text(size = 25, face = 'bold')) +
+#   ylab('Density')
 
 ###############################################################################
 # Train the model
@@ -121,11 +121,15 @@ ggplot(pca_train, aes(x = PC3, colour = classe)) +
 set.seed(123)
 
 # Create a smaller sample for training the model
-small_train <- train %>%
-  sample_frac(0.1, replace = FALSE)
+indx <- createDataPartition(train$classe
+                    , p = 0.1
+                    , list = FALSE)
+
+small_train <- train[indx, ]
 
 # Train the model
-fit_control <- trainControl(method = 'repeatedcv', number = 4)
+fit_control <- trainControl(method = 'repeatedcv'
+                            , number = 4)
 
 model_fit <- train(classe ~ ., data = select(small_train,-user_name)
                    , method = 'rf'
