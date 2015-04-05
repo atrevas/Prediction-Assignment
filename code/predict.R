@@ -88,11 +88,15 @@ dim(test)
 
 
 ###############################################################################
-# Create list of names of numeric variables
+# Create list of names of predictors variables
 ###############################################################################
 # Create list of numeric variables 
 is_num <- sapply(train, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
+
+# Remove the X variable as it is a kind of key that is unique for each
+# observation
+predictors <- numerics[numerics != 'X']
 
 ###############################################################################
 # Exploratory Data Analysis at the PCA
@@ -131,7 +135,8 @@ small_train <- train[indx, ]
 fit_control <- trainControl(method = 'repeatedcv'
                             , number = 4)
 ptm <- proc.time()
-model_fit <- train(classe ~ ., data = select(train,-user_name)
+model_fit <- train(x = train[, predictors]
+                   , y = train$classe
                    , method = 'rf'
                    , metric = 'Accuracy'
                    , trControl = fit_control)
