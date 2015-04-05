@@ -72,7 +72,7 @@ test <- test %>%
 
 
 ###############################################################################
-# Remove zero and near zer-variance predictors
+# Remove zero and near zero-variance predictors
 ###############################################################################
 nzv <- nearZeroVar(train)
 
@@ -122,7 +122,7 @@ set.seed(123)
 
 # Create a smaller sample for training the model
 indx <- createDataPartition(train$classe
-                    , p = 0.1
+                    , p = 0.5
                     , list = FALSE)
 
 small_train <- train[indx, ]
@@ -131,7 +131,7 @@ small_train <- train[indx, ]
 fit_control <- trainControl(method = 'repeatedcv'
                             , number = 4)
 ptm <- proc.time()
-model_fit <- train(classe ~ ., data = select(small_train,-user_name)
+model_fit <- train(classe ~ ., data = select(train,-user_name)
                    , method = 'rf'
                    , metric = 'Accuracy'
                    , trControl = fit_control)
