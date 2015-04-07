@@ -18,20 +18,20 @@ load_data <- function(file){
 # Load the data
 ###############################################################################
 # Load the training data
-raw_train <- load_data('pml-training.csv')
-raw_train <- tbl_df(raw_train)
+raw_train_data <- load_data('pml-training.csv')
+raw_train_data <- tbl_df(raw_train_data)
 
 # Load the test data
-raw_test <- load_data('pml-testing.csv')
-raw_test <- tbl_df(raw_test)
+raw_test_data <- load_data('pml-testing.csv')
+raw_test_data <- tbl_df(raw_test_data)
 
 ###############################################################################
 # First look at the raw data
 ###############################################################################
 # How many observation and variables we have
-d <- dim(raw_train)
+d <- dim(raw_train_data)
 df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
-d <- dim(raw_test)
+d <- dim(raw_test_data)
 df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
 
@@ -39,28 +39,28 @@ rbind(df1, df2)
 # Remove variables with lots of NAs
 ###############################################################################
 # Get the percentage of NAs values in each variable
-perc_nas <- sapply(raw_train, function (x) sum(is.na(x)) / length(x))
+perc_nas <- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
 high_nas <- names(perc_nas[perc_nas > 0.9])
 
 # Remove the hight NAs variables from train data
-train <- raw_train %>%
+train_data <- raw_train_data %>%
   select( - one_of(high_nas))
 
 # Remove the hight NAs variables from test data
-test <- raw_test %>%
+test_data <- raw_test_data %>%
   select( - one_of(high_nas))
 
 ###############################################################################
 # Remove timestamp variables
 ###############################################################################
 # From train data
-train <- train %>%
+train_data <- train_data %>%
    select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
 
 # From test data
-test <- test %>%
+test_data <- test_data %>%
    select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
 
 ###############################################################################
@@ -74,24 +74,24 @@ test <- test %>%
 ###############################################################################
 # Remove zero and near zero-variance predictors
 ###############################################################################
-nzv <- nearZeroVar(train)
+nzv <- nearZeroVar(train_data)
 
-dim(train)
-train <- train %>%
+dim(train_data)
+train_data <- train_data %>%
   select(-nzv)
-dim(train)
+dim(train_data)
 
-dim(test)
-test <- test %>%
+dim(test_data)
+test_data <- test_data %>%
   select(-nzv)
-dim(test)
+dim(test_data)
 
 
 ###############################################################################
 # Create list of names of predictors variables
 ###############################################################################
 # Create list of numeric variables 
-is_num <- sapply(train, is.numeric)
+is_num <- sapply(train_data, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
 
 # Remove the X variable as it is a kind of key that is unique for each
@@ -125,20 +125,20 @@ predictors <- numerics[numerics != 'X']
 set.seed(123)
 
 # Create a smaller sample for training the model
-indx <- createDataPartition(train$classe
-                    , p = 0.5
+indx <- createDataPartition(train_data$classe
+                    , p = 0.25
                     , list = FALSE)
 
-small_train <- train[indx, ]
+small_train_data <- train_data[indx, ]
 
 # Train the model
 fit_control <- trainControl(method = 'repeatedcv'
                             , number = 4)
-ptm <- proc.time()
-model_fit <- train(x = train[, predictors]
-                   , y = train$classe
+
+model_fit <- train(x = small_train_data[, predictors]
+                   , y = small_train_data$classe
                    , method = 'rf'
                    , metric = 'Accuracy'
                    , trControl = fit_control)
-proc.time() - ptm
+
 model_fit
