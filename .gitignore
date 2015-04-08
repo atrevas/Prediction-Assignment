@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 data
+predict.html
+predict_cache
