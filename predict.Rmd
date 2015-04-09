@@ -5,8 +5,10 @@ output: html_document
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
-library(dplyr) # For data manipulation functions
-library(caret) # For
+library(dplyr)      # For data manipulation functions
+library(caret)      # For classification and regression training
+library(rpart.plot) # For the fancyRpartPlot function
+library(rattle)     # For prettier tree plots
 ```
 
 
@@ -47,8 +49,6 @@ df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
 d <- dim(raw_test_data)
 df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
-
-glimpse(raw_train_data)
 ```
 
 ## Remove variables with lots of NAs
@@ -77,13 +77,16 @@ test_data <- raw_test_data %>%
 ###############################################################################
 # Remove timestamp variables
 ###############################################################################
-# From train data
-train_data <- train_data %>%
-   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+# Create a list of variables to remove
+var_list <- c('raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp')
 
-# From test data
+# Remove from train data
+train_data <- train_data %>%
+   select(-one_of(var_list))
+
+# Remove from test data
 test_data <- test_data %>%
-   select(- raw_timestamp_part_1, -raw_timestamp_part_2, -cvtd_timestamp)
+   select(-one_of(var_list))
 ```
 
 ## Remove zero and near zero-variance variables
@@ -126,8 +129,8 @@ table(train_data$classe)
 
 set.seed(123)
 
-control <- trainControl(method = 'cv' # Cross-validation
-                        , number = 5  # Number of subsamples to take
+control <- trainControl(method = 'cv'   # Cross-validation
+                        , number = 10   # Number of subsamples to take
                         )
 
 tree_model <- train(x = train_data[, predictors]
@@ -137,6 +140,6 @@ tree_model <- train(x = train_data[, predictors]
 
 tree_model
 
-print(tree_model$finalModel)
+fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 ```
 
