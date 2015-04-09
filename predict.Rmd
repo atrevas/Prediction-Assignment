@@ -5,8 +5,8 @@ output: html_document
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
-library(dplyr)
-library(caret)
+library(dplyr) # For data manipulation functions
+library(caret) # For
 ```
 
 
@@ -47,6 +47,8 @@ df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
 d <- dim(raw_test_data)
 df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
+
+glimpse(raw_train_data)
 ```
 
 ## Remove variables with lots of NAs
@@ -117,4 +119,24 @@ predictors <- numerics[numerics != 'X']
 
 ```
 
+## Let us start with a Tree model
+```{r}
+
+table(train_data$classe)
+
+set.seed(123)
+
+control <- trainControl(method = 'cv' # Cross-validation
+                        , number = 5  # Number of subsamples to take
+                        )
+
+tree_model <- train(x = train_data[, predictors]
+                    , y = train_data$classe
+                    , method = 'rpart'
+                    , trControl = control)
+
+tree_model
+
+print(tree_model$finalModel)
+```
 
