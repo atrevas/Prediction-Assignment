@@ -9,6 +9,7 @@ library(dplyr)      # For data manipulation functions
 library(caret)      # For classification and regression training
 library(rpart.plot) # For the fancyRpartPlot function
 library(rattle)     # For prettier tree plots
+library(ggplot2)    # For graphics
 ```
 
 
@@ -51,16 +52,25 @@ df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
 ```
 
-## Remove variables with lots of NAs
+## Look for variables with lots of NAs
 ```{r}
 ###############################################################################
-# Remove variables with lots of NAs
+# Look for variables with lots of NAs
 ###############################################################################
 # Get the percentage of NAs values in each variable
 perc_nas <- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
 high_nas <- names(perc_nas[perc_nas > 0.9])
+
+high_nas
+```
+
+## Remove variables with lots of NAs
+```{r}
+###############################################################################
+# Remove variables with lots of NAs
+###############################################################################
 
 # Remove the hight NAs variables from train data
 train_data <- raw_train_data %>%
@@ -124,9 +134,9 @@ predictors <- numerics[numerics != 'X']
 
 ## Let us start with a Tree model
 ```{r}
-
-table(train_data$classe)
-
+###############################################################################
+# Build a tree model
+###############################################################################
 set.seed(123)
 
 control <- trainControl(method = 'cv'   # Cross-validation
@@ -137,9 +147,20 @@ tree_model <- train(x = train_data[, predictors]
                     , y = train_data$classe
                     , method = 'rpart'
                     , trControl = control)
-
+# Print the tree model
 tree_model
 
+# Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 ```
+  
+## Plot the variable at the root of the tree  
+The variable at the root of tree is the one that best separates the outcomes.
+```{r}
+train_data %>%
+  ggplot(aes(x = roll_belt , colour = classe)) +
+    geom_line(stat = 'density')
+
+```
+
 
