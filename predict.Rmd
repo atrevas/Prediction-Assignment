@@ -140,19 +140,28 @@ predictors <- numerics[numerics != 'X']
 set.seed(123)
 
 control <- trainControl(method = 'cv'   # Cross-validation
-                        , number = 10   # Number of subsamples to take
+                        , number = 5   # Number of subsamples to take
                         )
 
-tree_model <- train(x = train_data[, predictors]
-                    , y = train_data$classe
+tree_model <- train(
+                    x = train_data[, predictors] # Predictors
+                    , y = train_data$classe      # Outcome variable
                     , method = 'rpart'
-                    , trControl = control)
+                    , trControl = control
+                    , tuneLength = 30 # Number of models to be evaluated
+                    , metric = 'Accuracy'
+                    )
+
 # Print the tree model
 tree_model
 
 # Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 ```
+
+### Estimation of the out of sample error
+
+
   
 ## Plot the variable at the root of the tree  
 The variable at the root of tree is the one that best separates the outcomes.
@@ -163,4 +172,4 @@ train_data %>%
 
 ```
 
-
+## 
