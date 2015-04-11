@@ -5,7 +5,8 @@ output: html_document
 
 ## Introduction
 
-This document describes the 
+This report describes the results of Practical Machine Learning Prediction Project. The data set we will use is from accelerometers on the belt, forearm, arm and dumbell of 6 participants. These participants were asked to perform barbell lifts correctly and incorrectly in 5 diferent ways. 
+The goal is to use the provided training cases to build a model to predict the manner in which 20 test cases did the exercise. 
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
@@ -165,6 +166,17 @@ acc <-getTrainPerf(tree_model)[1]
 
 # Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
+
+# Build a data frame with a ranking of variables importance in the tree model
+vi <- varImp(tree_model)$importance
+vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
+
+# Plot the ranking of variables importance
+vi_df %>% 
+  top_n(10, imp) %>% 
+  arrange(desc(imp)) %>%
+  ggplot(aes(x = imp, y = reorder(var, imp))) +
+    geom_point(size = 3)
 ```
 
 ### Estimation of the out of sample error
