@@ -190,15 +190,5 @@ vi_df %>%
     geom_point(size = 3)
 ```
 
-  
-### Plot the variable at the root of the tree  
-The variable at the root of tree is the one that best separates the outcomes.
-
-```{r}
-train_data %>%
-  ggplot(aes(x = pitch_forearm , colour = classe)) +
-    geom_line(stat = 'density')
-
-```
 
 
