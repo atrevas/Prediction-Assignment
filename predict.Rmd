@@ -3,6 +3,10 @@ title: "Practical Data Science - Prediction Assignment"
 output: html_document
 ---
 
+## Introduction
+
+This document describes the 
+
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
 library(dplyr)      # For data manipulation functions
@@ -50,7 +54,11 @@ df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
 d <- dim(raw_test_data)
 df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
+
+glimpse(raw_train_data)
 ```
+
+There are `r df1$Obs` observations and `r df1$Vars` variables in the training data set. The response variable is *classe*.
 
 ## Look for variables with lots of NAs
 ```{r}
@@ -148,12 +156,12 @@ tree_model <- train(
                     , y = train_data$classe      # Outcome variable
                     , method = 'rpart'
                     , trControl = control
-                    , tuneLength = 30 # Number of models to be evaluated
+                    , tuneLength = 10 # Number of models to be evaluated
                     , metric = 'Accuracy'
                     )
 
-# Print the tree model
-tree_model
+# Get the accuracy from the resampling results for the chosen model
+acc <-getTrainPerf(tree_model)[1]
 
 # Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
@@ -161,10 +169,11 @@ fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 
 ### Estimation of the out of sample error
 
-
+From the results above, we estimate that the out of sample error is: `r sprintf('%.2f%%', (1 - acc) * 100)`, which is the average percentage of observation that were incorrectly classified in the cross validation process.
   
 ## Plot the variable at the root of the tree  
 The variable at the root of tree is the one that best separates the outcomes.
+
 ```{r}
 train_data %>%
   ggplot(aes(x = roll_belt , colour = classe)) +
