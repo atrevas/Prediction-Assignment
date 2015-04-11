@@ -61,25 +61,19 @@ glimpse(raw_train_data)
 
 There are `r df1$Obs` observations and `r df1$Vars` variables in the training data set. The response variable is *classe*.
 
-## Look for variables with lots of NAs
+## Look for variables with lots of NAs and remove them
+
+After a quick look at the data, we realize that there are some variables with lots of *NAs* values. So in order to simplify our job, we wil remove the variables with a high percentage of *NAs* values.
+
 ```{r}
 ###############################################################################
-# Look for variables with lots of NAs
+# Remove variables with lots of NAs
 ###############################################################################
 # Get the percentage of NAs values in each variable
 perc_nas <- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 
 # Get a list of variables with more than 90% of NAs values
 high_nas <- names(perc_nas[perc_nas > 0.9])
-
-high_nas
-```
-
-## Remove variables with lots of NAs
-```{r}
-###############################################################################
-# Remove variables with lots of NAs
-###############################################################################
 
 # Remove the hight NAs variables from train data
 train_data <- raw_train_data %>%
@@ -88,10 +82,12 @@ train_data <- raw_train_data %>%
 # Remove the hight NAs variables from test data
 test_data <- raw_test_data %>%
   select( - one_of(high_nas))
-
 ```
 
 ## Remove timestamp variables
+
+We will remove the timestamp variables because we believe they do not add to the model.
+
 ```{r}
 ###############################################################################
 # Remove timestamp variables
