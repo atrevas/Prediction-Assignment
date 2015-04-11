@@ -105,21 +105,23 @@ test_data <- test_data %>%
 ```
 
 ## Remove zero and near zero-variance variables
+
+We identify the predictors that have only a few unique values and remove them. This kind of predictors may cause problems depending on the type of model chosen.
+
 ```{r}
 ###############################################################################
 # Remove zero and near zero-variance variables
 ###############################################################################
 nzv <- nearZeroVar(train_data)
 
-dim(train_data)
-train_data <- train_data %>%
-  select(-nzv)
-dim(train_data)
+# Summarize near zero variance variables
+summary(train_data[ , nzv])
 
-dim(test_data)
-test_data <- test_data %>%
-  select(-nzv)
-dim(test_data)
+# Remove from the train data
+train_data <- train_data[ , -nzv]
+
+# Remove from the test data
+test_data <- test_data[ , -nzv]
 ```
 
 ## Create a list of names of predictors variables
