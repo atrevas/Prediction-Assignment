@@ -140,6 +140,9 @@ predictors <- numerics[numerics != 'X']
 ```
 
 ## Let us start with a Tree model
+
+We will start with a simple tree model. In order to estimate the out of sample error rate, we will be using k-fold cross-validation as the resampling method.  A set of models will be evaluated across a number of tuning parameters sets and accurary will be used as the metric to choose the best model.
+
 ```{r}
 ###############################################################################
 # Build a tree model
@@ -155,13 +158,24 @@ tree_model <- train(
                     , y = train_data$classe      # Outcome variable
                     , method = 'rpart'
                     , trControl = control
-                    , tuneLength = 10 # Number of models to be evaluated
+                    , tuneLength = 5 # Number of models to be evaluated
                     , metric = 'Accuracy'
                     )
 
+# Print the tree model
+tree_model
+
 # Get the accuracy from the resampling results for the chosen model
 acc <-getTrainPerf(tree_model)[1]
+```
 
+### Estimation of the out of sample error
+
+From the results above, we estimate that the accurary of the model when applied to the test data is: `r sprintf('%.2f%%', acc * 100)`, which is the average percentage of observation that were correctly classified in the cross validation process.
+
+### Plot information about the tree model
+
+```{r}
 # Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 
@@ -172,23 +186,19 @@ vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
 # Plot the ranking of variables importance
 vi_df %>% 
   top_n(10, imp) %>% 
-  arrange(desc(imp)) %>%
   ggplot(aes(x = imp, y = reorder(var, imp))) +
     geom_point(size = 3)
 ```
 
-### Estimation of the out of sample error
-
-From the results above, we estimate that the out of sample error is: `r sprintf('%.2f%%', (1 - acc) * 100)`, which is the average percentage of observation that were incorrectly classified in the cross validation process.
   
-## Plot the variable at the root of the tree  
+### Plot the variable at the root of the tree  
 The variable at the root of tree is the one that best separates the outcomes.
 
 ```{r}
 train_data %>%
-  ggplot(aes(x = roll_belt , colour = classe)) +
+  ggplot(aes(x = pitch_forearm , colour = classe)) +
     geom_line(stat = 'density')
 
 ```
 
-## 
+
