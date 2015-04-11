@@ -150,7 +150,7 @@ We will start with a simple tree model. In order to estimate the out of sample e
 set.seed(123)
 
 control <- trainControl(method = 'cv'   # Cross-validation
-                        , number = 5   # Number of subsamples to take
+                        , number = 2   # Number of subsamples to take
                         )
 
 tree_model <- train(
@@ -171,7 +171,7 @@ acc <-getTrainPerf(tree_model)[1]
 
 ### Estimation of the out of sample error
 
-From the results above, we estimate that the accurary of the model when applied to the test data is: `r sprintf('%.2f%%', acc * 100)`, which is the average percentage of observation that were correctly classified in the cross validation process.
+From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: `r sprintf('%.2f%%', (1 - acc) * 100)`, which is the average percentage of observation that were inccorrectly classified in the cross validation process.
 
 ### Plot information about the tree model
 
@@ -179,7 +179,7 @@ From the results above, we estimate that the accurary of the model when applied 
 # Plot the tree
 fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
 
-# Build a data frame with a ranking of variables importance in the tree model
+# Build a data frame with variables importance in the tree model
 vi <- varImp(tree_model)$importance
 vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
 
@@ -187,8 +187,60 @@ vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
 vi_df %>% 
   top_n(10, imp) %>% 
   ggplot(aes(x = imp, y = reorder(var, imp))) +
-    geom_point(size = 3)
+    geom_point(size = 3) +
+    xlab('Importance') +
+    ylab('Variable')
 ```
 
+## Build a Random Forest model
 
+Aiming to build a better model, we will now use Random Forest.
+
+```{r}
+###############################################################################
+# Build a random forest model
+###############################################################################
+set.seed(123)
+
+control <- trainControl(method = 'cv'   # Cross-validation
+                        , number = 2  # Number of subsamples to take
+                        )
+
+rf_model <- train (
+                    x = train_data[, predictors] # Predictors
+                    , y = train_data$classe      # Outcome variable
+                    , method = 'rf'
+                    , trControl = control
+                    , tuneLength = 1 # Number of models to be evaluated
+                    , metric = 'Accuracy'
+                    )
+
+# Print the tree model
+rf_model
+
+# Get the accuracy from the resampling results for the chosen model
+acc <-getTrainPerf(rf_model)[1]
+```
+
+### Estimation of the out of sample error
+
+From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: `r sprintf('%.2f%%', (1 - acc) * 100)`, which is the average percentage of observation that were incorrectly classified in the cross validation process.
+
+### Plot information about the random forest model
+
+```{r}
+# Build a data frame with variables importance in the random forest model
+vi <- varImp(rf_model)$importance
+vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
+
+# Plot the ranking of variables importance
+vi_df %>% 
+  top_n(10, imp) %>% 
+  ggplot(aes(x = imp, y = reorder(var, imp))) +
+    geom_point(size = 3) +
+    xlab('Importance') +
+    ylab('Variable')
+```
+
+## Predict the response variable for the test data
 
