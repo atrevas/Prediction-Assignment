@@ -163,21 +163,6 @@ control <- trainControl(method = 'cv' # K-fold cross-validation
 ### Training
 
 Train a tree model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
-```{r}
-# Build a tree model
-tree_model <- train(
-                    x = train_data[, predictors] # Predictors
-                    , y = train_data$classe      # Outcome variable
-                    , method = 'rpart'
-                    , trControl = control
-                    , tuneLength = 5 # Number of models to be evaluated
-                    , metric = 'Accuracy'
-                    )
-
-# Print information about the model
-tree_model
-
-```
 
 ### Estimation of the out of sample error
 ```{r}
@@ -191,28 +176,10 @@ err_rate
 
 From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: `r sprintf('%.2f%%', err_rate * 100)`, which is the average percentage of observation that were incorrectly classified in the cross validation process.
 
-### Plot information about the tree model
-
-```{r}
-# Plot the tree
-fancyRpartPlot(tree_model$finalModel, main = '', sub = '')
-
-# Build a data frame with variables importance in the tree model
-vi <- varImp(tree_model)$importance
-vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
-
-# Plot the ranking of variables importance
-vi_df %>% 
-  top_n(10, imp) %>% 
-  ggplot(aes(x = imp, y = reorder(var, imp))) +
-    geom_point(size = 3) +
-    xlab('Importance') +
-    ylab('Variable')
-```
 
 ## Build a Random Forest model
 
-Aiming to build a better model, we will now use Random Forest.
+We believe it is possible to build a better model. So let us give Random Forest a try.
 
 ```{r}
 ###############################################################################
