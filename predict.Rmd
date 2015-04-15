@@ -10,10 +10,8 @@ The goal is to use the provided training cases to build a model to predict the m
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
+library(caret)
 library(dplyr)        # For data manipulation functions
-library(caret)        # For classification and regression training
-library(rpart.plot)   # For the fancyRpartPlot function
-library(rattle)       # For prettier tree plots
 library(ggplot2)      # For graphics
 library(randomForest) # For random forest
 ```
