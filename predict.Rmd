@@ -10,15 +10,17 @@ The goal is to use the provided training cases to build a model to predict the m
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
-library(dplyr)      # For data manipulation functions
-library(caret)      # For classification and regression training
-library(rpart.plot) # For the fancyRpartPlot function
-library(rattle)     # For prettier tree plots
-library(ggplot2)    # For graphics
+library(dplyr)        # For data manipulation functions
+library(caret)        # For classification and regression training
+library(rpart.plot)   # For the fancyRpartPlot function
+library(rattle)       # For prettier tree plots
+library(ggplot2)      # For graphics
+library(randomForest) # For random forest
 ```
 
+## Load the data
 
-## Create function to load data
+### Create function to load data
 ```{r}
 load_data <- function(file){
   # Build a path for the data file name
@@ -30,7 +32,7 @@ load_data <- function(file){
 }
 ```
 
-## Load the data files
+### Load the data files
 ```{r, cache=TRUE}
 ###############################################################################
 # Load the data
@@ -139,20 +141,30 @@ predictors <- numerics[numerics != 'X']
 
 ```
 
-## Let us start with a Tree model
+## First Tree model
 
-We will start with a simple tree model. In order to estimate the out of sample error rate, we will be using k-fold cross-validation as the resampling method.  A set of models will be evaluated across a number of tuning parameters sets and accurary will be used as the metric to choose the best model.
+We will start with a simple tree model. In order to estimate the out of sample error rate, we will be using k-fold cross-validation as the resampling method. 
 
+### Cross-validation
+
+Set the seed to generate the same random numbers always.
 ```{r}
-###############################################################################
-# Build a tree model
-###############################################################################
 set.seed(123)
+```
 
-control <- trainControl(method = 'cv'   # Cross-validation
-                        , number = 2   # Number of subsamples to take
+By default, the train function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.
+We can change the type of resampling via the *trainControl* function.
+```{r}
+# Generate parameters to be used by the train function
+control <- trainControl(method = 'cv' # K-fold cross-validation
+                        , number = 2  # Number of folds to use
                         )
+```
+### Training
 
+Train a tree model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
+```{r}
+# Build a tree model
 tree_model <- train(
                     x = train_data[, predictors] # Predictors
                     , y = train_data$classe      # Outcome variable
@@ -162,16 +174,22 @@ tree_model <- train(
                     , metric = 'Accuracy'
                     )
 
-# Print the tree model
+# Print information about the model
 tree_model
 
-# Get the accuracy from the resampling results for the chosen model
-acc <-getTrainPerf(tree_model)[1]
 ```
 
 ### Estimation of the out of sample error
+```{r}
+# Get the average accuracy over cross-validation iterations
+acc <-getTrainPerf(tree_model)[1]
 
-From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: `r sprintf('%.2f%%', (1 - acc) * 100)`, which is the average percentage of observation that were inccorrectly classified in the cross validation process.
+# Transform accuracy into an error rate
+err_rate <- as.numeric(1 - acc)
+err_rate
+```
+
+From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: `r sprintf('%.2f%%', err_rate * 100)`, which is the average percentage of observation that were incorrectly classified in the cross validation process.
 
 ### Plot information about the tree model
 
@@ -200,26 +218,26 @@ Aiming to build a better model, we will now use Random Forest.
 ###############################################################################
 # Build a random forest model
 ###############################################################################
-set.seed(123)
-
-control <- trainControl(method = 'cv'   # Cross-validation
-                        , number = 2  # Number of subsamples to take
-                        )
-
-rf_model <- train (
-                    x = train_data[, predictors] # Predictors
-                    , y = train_data$classe      # Outcome variable
-                    , method = 'rf'
-                    , trControl = control
-                    , tuneLength = 1 # Number of models to be evaluated
-                    , metric = 'Accuracy'
-                    )
-
-# Print the tree model
-rf_model
-
-# Get the accuracy from the resampling results for the chosen model
-acc <-getTrainPerf(rf_model)[1]
+# set.seed(123)
+# 
+# control <- trainControl(method = 'cv'   # Cross-validation
+#                         , number = 2  # Number of subsamples to take
+#                         )
+# 
+# rf_model <- train (
+#                     x = train_data[, predictors] # Predictors
+#                     , y = train_data$classe      # Outcome variable
+#                     , method = 'rf'
+#                     , trControl = control
+#                     , tuneLength = 1 # Number of models to be evaluated
+#                     , metric = 'Accuracy'
+#                     )
+# 
+# # Print the tree model
+# rf_model
+# 
+# # Get the average accuracy over cross-validation iterations
+# acc <-getTrainPerf(rf_model)[1]
 ```
 
 ### Estimation of the out of sample error
@@ -230,17 +248,20 @@ From the results above, we estimate that the out of sample error rate of the mod
 
 ```{r}
 # Build a data frame with variables importance in the random forest model
-vi <- varImp(rf_model)$importance
-vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
-
-# Plot the ranking of variables importance
-vi_df %>% 
-  top_n(10, imp) %>% 
-  ggplot(aes(x = imp, y = reorder(var, imp))) +
-    geom_point(size = 3) +
-    xlab('Importance') +
-    ylab('Variable')
+# vi <- varImp(rf_model)$importance
+# vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
+# 
+# # Plot the ranking of variables importance
+# vi_df %>% 
+#   top_n(10, imp) %>% 
+#   ggplot(aes(x = imp, y = reorder(var, imp))) +
+#     geom_point(size = 3) +
+#     xlab('Importance') +
+#     ylab('Variable')
 ```
 
 ## Predict the response variable for the test data
+```{r}
+#pred <- predict(rf_model, test_data[, predictors] )
+```
 
