@@ -32,9 +32,6 @@ load_data <- function(file){
 
 ### Load the data files
 ```{r, cache=TRUE}
-###############################################################################
-# Load the data
-###############################################################################
 # Load the training data
 raw_train_data <- load_data('pml-training.csv')
 raw_train_data <- tbl_df(raw_train_data)
@@ -46,9 +43,6 @@ raw_test_data <- tbl_df(raw_test_data)
 
 ## Take a first look at the raw data
 ```{r}
-###############################################################################
-# First look at the raw data
-###############################################################################
 # How many observation and variables we have
 d <- dim(raw_train_data)
 df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
@@ -68,9 +62,6 @@ There are `r df1$Obs` observations and `r df1$Vars` variables in the training da
 After a quick look at the data, we realize that there are some variables with lots of *NAs* values. So in order to simplify our job, we wil remove the variables with a high percentage of *NAs* values.
 
 ```{r}
-###############################################################################
-# Remove variables with lots of NAs
-###############################################################################
 # Get the percentage of NAs values in each variable
 perc_nas <- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 
@@ -91,9 +82,6 @@ test_data <- raw_test_data %>%
 We will remove the timestamp variables because we believe they do not add to the model.
 
 ```{r}
-###############################################################################
-# Remove timestamp variables
-###############################################################################
 # Create a list of variables to remove
 var_list <- c('raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp')
 
@@ -111,9 +99,6 @@ test_data <- test_data %>%
 We identify the predictors that have only a few unique values and remove them. This kind of predictors may cause problems depending on the type of model chosen.
 
 ```{r}
-###############################################################################
-# Remove zero and near zero-variance variables
-###############################################################################
 nzv <- nearZeroVar(train_data)
 
 # Summarize near zero variance variables
@@ -128,9 +113,6 @@ test_data <- test_data[ , -nzv]
 
 ## Create a list of names of predictors variables
 ```{r}
-###############################################################################
-# Create list of names of predictors variables
-###############################################################################
 # Create list of numeric variables 
 is_num <- sapply(train_data, is.numeric)
 numerics <- names(is_num[is_num == TRUE])
@@ -180,9 +162,6 @@ Train a tree model, using the parameters defined above. The *tuneLength* paramet
 We believe it is possible to build a better model. So let us give Random Forest a try.
 
 ```{r}
-###############################################################################
-# Build a random forest model
-###############################################################################
 # set.seed(123)
 # 
 # control <- trainControl(method = 'cv'   # Cross-validation
