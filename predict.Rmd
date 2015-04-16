@@ -77,13 +77,14 @@ test_data <- raw_test_data %>%
   select( - one_of(high_nas))
 ```
 
-### Remove timestamp variables
+### Remove variables that do not add to the model
 
-We will remove the timestamp variables because we believe they do not add to the model.
+We will remove the variables we believe do not add to the model.
 
 ```{r}
 # Create a list of variables to remove
-var_list <- c('raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp')
+var_list <- c('raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp'
+              , 'X', 'user_name')
 
 # Remove from train data
 train_data <- train_data %>%
@@ -94,11 +95,12 @@ test_data <- test_data %>%
    select(-one_of(var_list))
 ```
 
-### Remove zero and near zero-variance variables
+### Remove zero and near-zero variance variables
 
-We identify the predictors that have only a few unique values and remove them. This kind of predictors may cause problems depending on the type of model chosen.
+We identify the predictors that have near-zero variance and remove them. This kind of predictors may cause problems depending on the type of model chosen.
 
 ```{r}
+# Get a list of variables with near-zero variance
 nzv <- nearZeroVar(train_data)
 
 # Summarize near zero variance variables
@@ -109,18 +111,6 @@ train_data <- train_data[ , -nzv]
 
 # Remove from the test data
 test_data <- test_data[ , -nzv]
-```
-
-## Create a list of names of predictors variables
-```{r}
-# Create list of numeric variables 
-is_num <- sapply(train_data, is.numeric)
-numerics <- names(is_num[is_num == TRUE])
-
-# Remove the X variable as it is a kind of key that is unique for each
-# observation
-predictors <- numerics[numerics != 'X']
-
 ```
 
 ## First Tree model
