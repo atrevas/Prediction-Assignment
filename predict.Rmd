@@ -113,6 +113,21 @@ train_data <- train_data[ , -nzv]
 test_data <- test_data[ , -nzv]
 ```
 
+### Data partition
+
+We will split the train data in two in order to have a data slice to train the model and another data slice to validate the model. Besides, we will be able to estimate the out-of-sample error rate.
+
+```{r}
+ind <- createDataPartition(y = train_data$classe
+                           , p = 0.6
+                           , list = FALSE)
+train_slice <- train_data[ind,]
+valid_slice <- train_data[-ind,]
+
+dim(train_slice)
+dim(valid_slice)
+```
+
 ## Build a Random Forest model
 
 We will start with a simple tree model. In order to estimate the out of sample error rate, we will be using k-fold cross-validation as the resampling method. 
@@ -124,7 +139,7 @@ We can change the type of resampling via the *trainControl* function.
 
 ### Training
 
-Train a tree model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
+Train a random forest model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
 
 ```{r}
 # Set the seed to generate the same random numbers always.
@@ -140,9 +155,9 @@ ptm <- proc.time()
 rf_model <- train (
                     classe ~ .
                     , data = train_data
-                    , method = 'rf'
+                    , method = 'rf'       # Random forest
                     , trControl = control
-                    #, tuneLength = 1 # Number of models to be evaluated
+                    , tuneLength = 1      # Number of models to be evaluated
                     , metric = 'Accuracy'
                     )
 
@@ -152,7 +167,7 @@ ptm <- proc.time() - ptm
 rf_model
 ```
 
-Elapsed training time: `r sprintf('%.2f',as.numeric(ptm['elapsed']))`
+Elapsed training time: `r sprintf('%.2f seconds',as.numeric(ptm['elapsed']))`
 
 ### Estimation of the out of sample error
 
