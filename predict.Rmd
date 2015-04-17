@@ -113,86 +113,50 @@ train_data <- train_data[ , -nzv]
 test_data <- test_data[ , -nzv]
 ```
 
-## First Tree model
+## Build a Random Forest model
 
 We will start with a simple tree model. In order to estimate the out of sample error rate, we will be using k-fold cross-validation as the resampling method. 
 
 ### Cross-validation
 
-Set the seed to generate the same random numbers always.
-```{r}
-set.seed(123)
-```
-
 By default, the train function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.
 We can change the type of resampling via the *trainControl* function.
-```{r}
-# Generate parameters to be used by the train function
-control <- trainControl(method = 'cv' # K-fold cross-validation
-                        , number = 2  # Number of folds to use
-                        )
-```
+
 ### Training
 
 Train a tree model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
 
-### Estimation of the out of sample error
 ```{r}
-# Get the average accuracy over cross-validation iterations
-#acc <-getTrainPerf(tree_model)[1]
+# Set the seed to generate the same random numbers always.
+set.seed(123)
+# 
+# Generate parameters to be used by the train function
+control <- trainControl(method = 'cv' # K-fold cross-validation
+                        , number = 2  # Number of folds to use
+                        )
+# Start the clock
+ptm <- proc.time()
 
-# Transform accuracy into an error rate
-#err_rate <- as.numeric(1 - acc)
-#err_rate
-#`r sprintf('%.2f%%', err_rate * 100)`
+rf_model <- train (
+                    classe ~ .
+                    , data = train_data
+                    , method = 'rf'
+                    , trControl = control
+                    #, tuneLength = 1 # Number of models to be evaluated
+                    , metric = 'Accuracy'
+                    )
+
+# Stop the clock
+ptm <- proc.time() - ptm
+
+rf_model
 ```
 
-## Build a Random Forest model
-
-We believe it is possible to build a better model. So let us give Random Forest a try.
-
-```{r}
-# set.seed(123)
-# 
-# control <- trainControl(method = 'cv'   # Cross-validation
-#                         , number = 2  # Number of subsamples to take
-#                         )
-# 
-# rf_model <- train (
-#                     x = train_data[, predictors] # Predictors
-#                     , y = train_data$classe      # Outcome variable
-#                     , method = 'rf'
-#                     , trControl = control
-#                     , tuneLength = 1 # Number of models to be evaluated
-#                     , metric = 'Accuracy'
-#                     )
-# 
-# # Print the tree model
-# rf_model
-# 
-# # Get the average accuracy over cross-validation iterations
-# acc <-getTrainPerf(rf_model)[1]
-```
+Elapsed training time: `r sprintf('%.2f',as.numeric(ptm['elapsed']))`
 
 ### Estimation of the out of sample error
 
 From the results above, we estimate that the out of sample error rate of the model when applied to the test data is: , which is the average percentage of observation that were incorrectly classified in the cross validation process.
-
-### Plot information about the random forest model
-
-```{r}
-# Build a data frame with variables importance in the random forest model
-# vi <- varImp(rf_model)$importance
-# vi_df <- data.frame( var = rownames(vi), imp = vi$Overall)
-# 
-# # Plot the ranking of variables importance
-# vi_df %>% 
-#   top_n(10, imp) %>% 
-#   ggplot(aes(x = imp, y = reorder(var, imp))) +
-#     geom_point(size = 3) +
-#     xlab('Importance') +
-#     ylab('Variable')
-```
 
 ## Predict the response variable for the test data
 ```{r}
