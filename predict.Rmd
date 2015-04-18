@@ -30,7 +30,7 @@ The data sets came from the following urls.
 
 ## Load the data
 
-### Create function to load data
+### Create a function to load data
 ```{r}
 load_data <- function(file){
   # Build a path for the data file name
@@ -127,7 +127,7 @@ test_data <- test_data[ , -nzv]
 
 ### Data partition
 
-We will split the original training data in order to have two data slices: one to train the model and another to validate the model. Besides, we will be able to estimate the out-of-sample error rate.
+We will split the original training data in order to have two data slices: one to train the model and another to validate the model. Besides, using the second slice to predict the response variable, we will be able to estimate the out-of-sample error rate.
 
 ```{r}
 # Set the seed to generate the same random numbers always.
@@ -136,6 +136,7 @@ set.seed(123)
 ind <- createDataPartition(y = train_data$classe
                            , p = 0.6
                            , list = FALSE)
+
 train_slice <- train_data[ind, ]
 valid_slice <- train_data[-ind, ]
 
@@ -143,22 +144,27 @@ dim(train_slice)
 dim(valid_slice)
 ```
 
-## Build a Random Forest model
+## Model building
+
+We will build our model on the train data slice. As random forests are considered one of the top performing algorithms, we decided to stick to it.
  
-### Cross-validation
+### Define training parameters
 
 By default, the train function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.
-We can change the type of resampling via the *trainControl* function.
-
-### Training
-
-Train a random forest model, using the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
 
 ```{r}
 # Generate parameters to be used by the train function
 control <- trainControl(method = 'cv' # K-fold cross-validation
                         , number = 2  # Number of folds to use
                         )
+```
+
+### Training
+
+Train a random forests model, using the train data slice and the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
+
+#### Train the model
+```{r}
 # Start the clock
 ptm <- proc.time()
 
@@ -174,14 +180,26 @@ rf_model <- train (
 # Stop the clock
 ptm <- proc.time() - ptm
 
-# Print the training results
-rf_model
 ```
 
 Elapsed training time: `r sprintf('%.2f seconds',as.numeric(ptm['elapsed']))`
 
-### Model Validation
+#### Print the training results
+```{r}
+# Print the training results
+rf_model
+```
 
+#### Print the final model
+```{r}
+rf_model$finalModel
+```
+
+## Model Validation
+
+Now that we have our model, we will validate it on the validation data slice and estimate our out-of-sample error rate.
+
+### Predict on the validation data
 ```{r}
 # Predict the response variable for the validation data set
 pred <- predict(rf_model, valid_slice %>% select(-classe))
@@ -192,13 +210,12 @@ cm <- confusionMatrix(pred, valid_slice$classe)
 # Display the confusion matrix
 cm
 
-# Save the overall accuracy from the confusion matrix
+# Get the overall accuracy from the confusion matrix
 acc <- as.numeric(cm$overall['Accuracy'])
 
-# Save the estimated error rate
+# Get the estimated error rate
 err <- 1 - acc
 ```
-
 
 ### Estimation of the out of sample error
 
