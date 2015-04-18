@@ -16,6 +16,18 @@ library(ggplot2)      # For graphics
 library(randomForest) # For random forest
 ```
 
+## Data sources
+
+The data sets came from the following urls.
+
+### Training data
+
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+
+### Testing data
+
+[https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+
 ## Load the data
 
 ### Create function to load data
@@ -115,7 +127,7 @@ test_data <- test_data[ , -nzv]
 
 ### Data partition
 
-We will split the train data in order to have two data slices: one to train the model and another to validate the model. Besides, we will be able to estimate the out-of-sample error rate.
+We will split the original training data in order to have two data slices: one to train the model and another to validate the model. Besides, we will be able to estimate the out-of-sample error rate.
 
 ```{r}
 # Set the seed to generate the same random numbers always.
