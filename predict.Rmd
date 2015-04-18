@@ -10,10 +10,10 @@ The goal is to use the provided training cases to build a model to predict the m
 
 ## Load necessary packages
 ```{r, message=FALSE, warning=FALSE}
-library(caret)
+library(caret)        # For machine learning functions
 library(dplyr)        # For data manipulation functions
 library(ggplot2)      # For graphics
-library(randomForest) # For random forest
+library(randomForest) # For random forests
 ```
 
 ## Data sources
@@ -54,6 +54,8 @@ raw_test_data <- tbl_df(raw_test_data)
 ```
 
 ## Take a first look at the raw data
+
+### Print number of observations and variables
 ```{r}
 # How many observation and variables we have
 d <- dim(raw_train_data)
@@ -61,11 +63,14 @@ df1 <- data.frame(Data = 'train',Obs = d[1], Vars = d[2])
 d <- dim(raw_test_data)
 df2 <- data.frame(Data = 'test',Obs = d[1], Vars = d[2])
 rbind(df1, df2)
-
-glimpse(raw_train_data)
 ```
 
 There are `r df1$Obs` observations and `r df1$Vars` variables in the training data set. The response variable is *classe*.
+
+### Print a summary of the training data
+```{r}
+glimpse(raw_train_data)
+```
 
 ## Data Preparation
 
@@ -161,7 +166,7 @@ control <- trainControl(method = 'cv' # K-fold cross-validation
 
 ### Training
 
-Train a random forests model, using the train data slice and the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. The best one will be chosen by the function as the final one.
+Train a random forests model, using the train data slice and the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. We decided to set this parameter to a minimum, because random forests models may take some time to train. 
 
 #### Train the model
 ```{r}
@@ -169,9 +174,9 @@ Train a random forests model, using the train data slice and the parameters defi
 ptm <- proc.time()
 
 rf_model <- train (
-                    classe ~ .
-                    , data = train_slice
-                    , method = 'rf'       # Random forest
+                    classe ~ .            # Classe is the response variable
+                    , data = train_slice  # Use the trian data slice
+                    , method = 'rf'       # Random forests
                     , trControl = control
                     , tuneLength = 1      # Number of models to be evaluated
                     , metric = 'Accuracy'
@@ -197,7 +202,7 @@ rf_model$finalModel
 
 ## Model Validation
 
-Now that we have our model, we will validate it on the validation data slice and estimate our out-of-sample error rate.
+Now that we have our model built, we will validate it on the validation data slice and estimate our out-of-sample error rate.
 
 ### Predict on the validation data
 ```{r}
@@ -220,3 +225,12 @@ err <- 1 - acc
 ### Estimation of the out of sample error
 
 From the results above, the estimated accuracy of the model is `r sprintf('%.2f%%',acc * 100)` and the corresponding estimated out-of-sample error rate is `r sprintf('%.2f%%', err * 100)`.
+
+## Final prediction
+
+The error rate estimated from the random forests model seems great, so we decide to apply this very model to the 20 test cases provided for final prediction evaluation.
+
+```{r}
+pred <- predict(rf_model, test_data %>% select(-problem_id))
+```
+
