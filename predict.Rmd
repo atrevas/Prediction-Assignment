@@ -104,12 +104,10 @@ var_list <- c('raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp'
               , 'X', 'user_name')
 
 # Remove from train data
-train_data <- train_data %>%
-   select(-one_of(var_list))
+train_data <- select(train_data, -one_of(var_list))
 
 # Remove from test data
-test_data <- test_data %>%
-   select(-one_of(var_list))
+test_data <- select(test_data, -one_of(var_list))
 ```
 
 ### Remove zero and near-zero variance variables
@@ -155,7 +153,7 @@ We will build our model on the train data slice. As random forests are considere
  
 ### Define training parameters
 
-By default, the train function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.
+By default, the *train* function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.
 
 ```{r}
 # Generate parameters to be used by the train function
@@ -207,7 +205,7 @@ Now that we have our model built, we will validate it on the validation data sli
 ### Predict on the validation data
 ```{r}
 # Predict the response variable for the validation data set
-pred <- predict(rf_model, valid_slice %>% select(-classe))
+pred <- predict(rf_model,  select(valid_slice, -classe))
 
 # Save the confusion matrix
 cm <- confusionMatrix(pred, valid_slice$classe)
@@ -231,6 +229,6 @@ From the results above, the estimated accuracy of the model is `r sprintf('%.2f%
 The error rate estimated from the random forests model seems great, so we decide to apply this very model to the 20 test cases provided for final prediction evaluation.
 
 ```{r}
-pred <- predict(rf_model, test_data %>% select(-problem_id))
+pred <- predict(rf_model, select(test_data, -problem_id))
 ```
 
