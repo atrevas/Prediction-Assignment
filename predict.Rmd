@@ -5,7 +5,6 @@ output: html_document
 
 ## Introduction
 
-In this project, we will use a data set from accelerometers on the belt, forearm, arm and dumbell of 6 participants. These participants were asked to perform barbell lifts correctly and incorrectly in 5 diferent ways. 
 The goal is to use the provided training cases to build a model to predict the manner in which 20 test cases did the exercise. 
 
 ## Load necessary packages
