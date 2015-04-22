@@ -227,7 +227,34 @@ From the results above, the estimated accuracy of the model is `r sprintf('%.2f%
 
 The error rate estimated from the random forests model seems great, so we decide to apply this very model to the 20 test cases provided for final prediction evaluation.
 
+### Apply the model to the test data
 ```{r}
+# Predict responses for the testing data
 pred <- predict(rf_model, select(test_data, -problem_id))
 ```
+
+### Function to write the results files
+Create a function to write a file for each test case and the corresponding prediction.
+
+```{r}
+pml_write_files <- function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename <- paste0("problem_id_",i,".txt")
+    filename <- file.path('submission', filename)
+    write.table(x[i]
+                , file = filename
+                , quote = FALSE
+                , row.names = FALSE
+                , col.names = FALSE)
+  }
+}
+```
+
+### Execute the function to write the results files
+```{r}
+# Write the files with the resulting predictions
+pml_write_files(pred)
+```
+
 
