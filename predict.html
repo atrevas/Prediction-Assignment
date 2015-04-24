@@ -391,7 +391,7 @@ rf_model &lt;- train (
 
 # Stop the clock
 ptm &lt;- proc.time() - ptm</code></pre>
-<p>Elapsed training time: 149.22 seconds</p>
+<p>Elapsed training time: 114.76 seconds</p>
 </div>
 <div id="print-the-training-results" class="section level4">
 <h4>Print the training results</h4>
@@ -497,7 +497,8 @@ err &lt;- 1 - acc</code></pre>
 <p>The error rate estimated from the random forests model seems great, so we decide to apply this very model to the 20 test cases provided for final prediction evaluation.</p>
 <div id="apply-the-model-to-the-test-data" class="section level3">
 <h3>Apply the model to the test data</h3>
-<pre class="r"><code>pred &lt;- predict(rf_model, select(test_data, -problem_id))</code></pre>
+<pre class="r"><code># Predict responses for the testing data
+pred &lt;- predict(rf_model, select(test_data, -problem_id))</code></pre>
 </div>
 <div id="function-to-write-the-results-files" class="section level3">
 <h3>Function to write the results files</h3>
@@ -517,7 +518,8 @@ err &lt;- 1 - acc</code></pre>
 </div>
 <div id="execute-the-function-to-write-the-results-files" class="section level3">
 <h3>Execute the function to write the results files</h3>
-<pre class="r"><code>pml_write_files(pred)</code></pre>
+<pre class="r"><code># Write the files with the resulting predictions
+pml_write_files(pred)</code></pre>
 </div>
 </div>
 
