@@ -7,6 +7,7 @@ output:
 
 ## Introduction
 
+In this project, we will use a data set from accelerometers on the belt, forearm, arm and dumbell of 6 participants. These participants were asked to perform barbell lifts correctly and incorrectly in 5 diferent ways.
 The goal is to use the provided training cases to build a model to predict the manner in which 20 test cases did the exercise. 
 
 ## Load necessary packages
@@ -154,7 +155,7 @@ dim(valid_slice)
 
 ## Model building
 
-We will build our model on the train data slice. As random forests are considered one of the top performing algorithms, we decided to stick to it.
+We will build our model on the training data slice. As random forests are considered one of the top performing algorithms, we decided to stick to it.
  
 ### Define training parameters
 
@@ -169,7 +170,7 @@ control <- trainControl(method = 'cv' # K-fold cross-validation
 
 ### Training
 
-Train a random forests model, using the train data slice and the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. We decided to set this parameter to a minimum, because random forests models may take some time to train. 
+Train a random forests model, using the training data slice and the parameters defined above. The *tuneLength* parameter is used to specify the number of models to evaluate. We decided to set this parameter to a minimum, because random forests models may take some time to train. 
 
 #### Train the model
 ```{r}
@@ -178,7 +179,7 @@ ptm <- proc.time()
 
 rf_model <- train (
                     classe ~ .            # Classe is the response variable
-                    , data = train_slice  # Use the trian data slice
+                    , data = train_slice  # Use the training data slice
                     , method = 'rf'       # Random forests
                     , trControl = control
                     , tuneLength = 1      # Number of models to be evaluated
@@ -209,7 +210,7 @@ Now that we have our model built, we will validate it on the validation data sli
 
 ### Predict on the validation data
 ```{r}
-# Predict the response variable for the validation data set
+# Predict the response variable for the validation data slice
 pred <- predict(rf_model,  select(valid_slice, -classe))
 
 # Save the confusion matrix
