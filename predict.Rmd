@@ -89,12 +89,10 @@ perc_nas <- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 high_nas <- names(perc_nas[perc_nas > 0.9])
 
 # Remove the hight NAs variables from train data
-train_data <- raw_train_data %>%
-  select( - one_of(high_nas))
-
+train_data <- select (raw_train_data , -one_of(high_nas))
+  
 # Remove the hight NAs variables from test data
-test_data <- raw_test_data %>%
-  select( - one_of(high_nas))
+test_data <- select(raw_test_data, -one_of(high_nas))
 ```
 
 ### Remove variables that do not add to the model
@@ -139,6 +137,7 @@ We will split the original training data in order to have two data slices: one t
 # Set the seed to generate the same random numbers always.
 set.seed(123)
 
+# Create two data slices
 ind <- createDataPartition(y = train_data$classe
                            , p = 0.6
                            , list = FALSE)
