@@ -70,6 +70,7 @@ There are `r df1$Obs` observations and `r df1$Vars` variables in the training da
 
 ### Print a summary of the training data
 ```{r}
+# Print a summary of the training data
 glimpse(raw_train_data)
 ```
 
@@ -144,7 +145,10 @@ ind <- createDataPartition(y = train_data$classe
 train_slice <- train_data[ind, ]
 valid_slice <- train_data[-ind, ]
 
+# Print size of the training data slice
 dim(train_slice)
+
+# Print size of the validation data slice
 dim(valid_slice)
 ```
 
@@ -184,9 +188,9 @@ rf_model <- train (
 # Stop the clock
 ptm <- proc.time() - ptm
 
+# Print the elapsed time
+sprintf('Elapsed training time: %.2f seconds',as.numeric(ptm['elapsed']))
 ```
-
-Elapsed training time: `r sprintf('%.2f seconds',as.numeric(ptm['elapsed']))`
 
 #### Print the training results
 ```{r}
