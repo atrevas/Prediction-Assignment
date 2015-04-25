@@ -1,6 +1,8 @@
 ---
 title: "Practical Data Science - Prediction Assignment"
-output: html_document
+output:
+  html_document:
+    toc: yes
 ---
 
 ## Introduction
@@ -71,7 +73,7 @@ There are `r df1$Obs` observations and `r df1$Vars` variables in the training da
 glimpse(raw_train_data)
 ```
 
-## Data Preparation
+## Data preparation
 
 ### Look for variables with lots of NAs and remove them
 
