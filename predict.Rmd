@@ -32,6 +32,8 @@ The data sets came from the following urls.
 
 ## Load the data
 
+The files above were downloaded and saved in a local folder named *data*.
+
 ### Create a function to load data
 ```{r}
 load_data <- function(file){
