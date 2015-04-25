@@ -63,10 +63,47 @@ img {
 <h1 class="title">Practical Data Science - Prediction Assignment</h1>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#load-necessary-packages">Load necessary packages</a></li>
+<li><a href="#data-sources">Data sources</a><ul>
+<li><a href="#training-data">Training data</a></li>
+<li><a href="#testing-data">Testing data</a></li>
+</ul></li>
+<li><a href="#load-the-data">Load the data</a><ul>
+<li><a href="#create-a-function-to-load-data">Create a function to load data</a></li>
+<li><a href="#load-the-data-files">Load the data files</a></li>
+</ul></li>
+<li><a href="#take-a-first-look-at-the-raw-data">Take a first look at the raw data</a><ul>
+<li><a href="#print-number-of-observations-and-variables">Print number of observations and variables</a></li>
+<li><a href="#print-a-summary-of-the-training-data">Print a summary of the training data</a></li>
+</ul></li>
+<li><a href="#data-preparation">Data preparation</a><ul>
+<li><a href="#look-for-variables-with-lots-of-nas-and-remove-them">Look for variables with lots of NAs and remove them</a></li>
+<li><a href="#remove-variables-that-do-not-add-to-the-model">Remove variables that do not add to the model</a></li>
+<li><a href="#remove-zero-and-near-zero-variance-variables">Remove zero and near-zero variance variables</a></li>
+<li><a href="#data-partition">Data partition</a></li>
+</ul></li>
+<li><a href="#model-building">Model building</a><ul>
+<li><a href="#define-training-parameters">Define training parameters</a></li>
+<li><a href="#training">Training</a></li>
+</ul></li>
+<li><a href="#model-validation">Model Validation</a><ul>
+<li><a href="#predict-on-the-validation-data">Predict on the validation data</a></li>
+<li><a href="#estimation-of-the-out-of-sample-error">Estimation of the out of sample error</a></li>
+</ul></li>
+<li><a href="#final-prediction">Final prediction</a><ul>
+<li><a href="#apply-the-model-to-the-test-data">Apply the model to the test data</a></li>
+<li><a href="#function-to-write-the-results-files">Function to write the results files</a></li>
+<li><a href="#execute-the-function-to-write-the-results-files">Execute the function to write the results files</a></li>
+</ul></li>
+</ul>
+</div>
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>The goal is to use the provided training cases to build a model to predict the manner in which 20 test cases did the exercise.</p>
+<p>In this project, we will use a data set from accelerometers on the belt, forearm, arm and dumbell of 6 participants. These participants were asked to perform barbell lifts correctly and incorrectly in 5 diferent ways. The goal is to use the provided training cases to build a model to predict the manner in which 20 test cases did the exercise.</p>
 </div>
 <div id="load-necessary-packages" class="section level2">
 <h2>Load necessary packages</h2>
@@ -89,6 +126,7 @@ library(randomForest) # For random forests</code></pre>
 </div>
 <div id="load-the-data" class="section level2">
 <h2>Load the data</h2>
+<p>The files above were downloaded and saved in a local folder named <em>data</em>.</p>
 <div id="create-a-function-to-load-data" class="section level3">
 <h3>Create a function to load data</h3>
 <pre class="r"><code>load_data &lt;- function(file){
@@ -128,7 +166,8 @@ rbind(df1, df2)</code></pre>
 </div>
 <div id="print-a-summary-of-the-training-data" class="section level3">
 <h3>Print a summary of the training data</h3>
-<pre class="r"><code>glimpse(raw_train_data)</code></pre>
+<pre class="r"><code># Print a summary of the training data
+glimpse(raw_train_data)</code></pre>
 <pre><code>## Observations: 19622
 ## Variables:
 ## $ X                        (int) 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12...
@@ -294,7 +333,7 @@ rbind(df1, df2)</code></pre>
 </div>
 </div>
 <div id="data-preparation" class="section level2">
-<h2>Data Preparation</h2>
+<h2>Data preparation</h2>
 <div id="look-for-variables-with-lots-of-nas-and-remove-them" class="section level3">
 <h3>Look for variables with lots of NAs and remove them</h3>
 <p>After a quick look at the data, we realize that there are some variables with lots of <em>NAs</em> values. So in order to simplify our job, we wil remove the variables with a high percentage of <em>NAs</em> values.</p>
@@ -305,12 +344,10 @@ perc_nas &lt;- sapply(raw_train_data, function (x) sum(is.na(x)) / length(x))
 high_nas &lt;- names(perc_nas[perc_nas &gt; 0.9])
 
 # Remove the hight NAs variables from train data
-train_data &lt;- raw_train_data %&gt;%
-  select( - one_of(high_nas))
-
+train_data &lt;- select (raw_train_data , -one_of(high_nas))
+  
 # Remove the hight NAs variables from test data
-test_data &lt;- raw_test_data %&gt;%
-  select( - one_of(high_nas))</code></pre>
+test_data &lt;- select(raw_test_data, -one_of(high_nas))</code></pre>
 </div>
 <div id="remove-variables-that-do-not-add-to-the-model" class="section level3">
 <h3>Remove variables that do not add to the model</h3>
@@ -348,6 +385,7 @@ test_data &lt;- test_data[ , -nzv]</code></pre>
 <pre class="r"><code># Set the seed to generate the same random numbers always.
 set.seed(123)
 
+# Create two data slices
 ind &lt;- createDataPartition(y = train_data$classe
                            , p = 0.6
                            , list = FALSE)
@@ -355,15 +393,17 @@ ind &lt;- createDataPartition(y = train_data$classe
 train_slice &lt;- train_data[ind, ]
 valid_slice &lt;- train_data[-ind, ]
 
+# Print size of the training data slice
 dim(train_slice)</code></pre>
 <pre><code>## [1] 11776    54</code></pre>
-<pre class="r"><code>dim(valid_slice)</code></pre>
+<pre class="r"><code># Print size of the validation data slice
+dim(valid_slice)</code></pre>
 <pre><code>## [1] 7846   54</code></pre>
 </div>
 </div>
 <div id="model-building" class="section level2">
 <h2>Model building</h2>
-<p>We will build our model on the train data slice. As random forests are considered one of the top performing algorithms, we decided to stick to it.</p>
+<p>We will build our model on the training data slice. As random forests are considered one of the top performing algorithms, we decided to stick to it.</p>
 <div id="define-training-parameters" class="section level3">
 <h3>Define training parameters</h3>
 <p>By default, the <em>train</em> function of the Caret package uses the bootstrap for resampling. We will switch to k-fold cross-validation instead.</p>
@@ -374,7 +414,7 @@ control &lt;- trainControl(method = 'cv' # K-fold cross-validation
 </div>
 <div id="training" class="section level3">
 <h3>Training</h3>
-<p>Train a random forests model, using the train data slice and the parameters defined above. The <em>tuneLength</em> parameter is used to specify the number of models to evaluate. We decided to set this parameter to a minimum, because random forests models may take some time to train.</p>
+<p>Train a random forests model, using the training data slice and the parameters defined above. The <em>tuneLength</em> parameter is used to specify the number of models to evaluate. We decided to set this parameter to a minimum, because random forests models may take some time to train.</p>
 <div id="train-the-model" class="section level4">
 <h4>Train the model</h4>
 <pre class="r"><code># Start the clock
@@ -382,7 +422,7 @@ ptm &lt;- proc.time()
 
 rf_model &lt;- train (
                     classe ~ .            # Classe is the response variable
-                    , data = train_slice  # Use the trian data slice
+                    , data = train_slice  # Use the training data slice
                     , method = 'rf'       # Random forests
                     , trControl = control
                     , tuneLength = 1      # Number of models to be evaluated
@@ -390,8 +430,11 @@ rf_model &lt;- train (
                     )
 
 # Stop the clock
-ptm &lt;- proc.time() - ptm</code></pre>
-<p>Elapsed training time: 114.76 seconds</p>
+ptm &lt;- proc.time() - ptm
+
+# Print the elapsed time
+sprintf('Elapsed training time: %.2f seconds',as.numeric(ptm['elapsed']))</code></pre>
+<pre><code>## [1] &quot;Elapsed training time: 116.37 seconds&quot;</code></pre>
 </div>
 <div id="print-the-training-results" class="section level4">
 <h4>Print the training results</h4>
@@ -442,7 +485,7 @@ rf_model</code></pre>
 <p>Now that we have our model built, we will validate it on the validation data slice and estimate our out-of-sample error rate.</p>
 <div id="predict-on-the-validation-data" class="section level3">
 <h3>Predict on the validation data</h3>
-<pre class="r"><code># Predict the response variable for the validation data set
+<pre class="r"><code># Predict the response variable for the validation data slice
 pred &lt;- predict(rf_model,  select(valid_slice, -classe))
 
 # Save the confusion matrix
